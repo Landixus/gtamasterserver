@@ -50,15 +50,21 @@ class gtamasterserver
     {        
     
         $servers = mysqli_query($this->db, "SELECT * FROM servers");
-        $server = array("list" => array());
+        $server = array();
         
         while($row = mysqli_fetch_array($servers))
         {
-            array_push($server["list"], $row[1]);
+            array_push($server, $row[1]);
         }
         
         return $server;
     }
+	
+	function getCount(){
+		$count = mysqli_query($this->db, "SELECT count(*) as count FROM servers");
+		
+		return mysqli_fetch_assoc($count)['count'];
+	}
     
 }
 
@@ -76,17 +82,12 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST')
         $gta->addServer($_SERVER["REMOTE_ADDR"] . ":" . $post);
     }else
     {
-        //fuckoff don't post bullshit
+        //fuckoff don't post b*llshit
         header("HTTP/1.0 403 Forbidden");
     }
-    
 }else
 {
-    
    $gta->cleanUp();
-   echo json_encode($gta->getServers());
-    
+   echo json_encode(array("count" => (int) $gta->getCount(), "list" => $gta->getServers()));
 }
-
-
 ?>
